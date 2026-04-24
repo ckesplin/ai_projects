@@ -50,7 +50,11 @@ When a test changes based on feedback, extract the underlying principle that app
 ### Truth & Calibration System
 - **truth-repo skill:** `skills/truth-repo/` — persistent verified facts, temp assumptions with expiry, `/truth` commands
 - **calibration skill:** `skills/calibration/` — prediction/outcome tracking for confidence marker accuracy
-- **Beads issues:** workspace-mr0 (calibration), workspace-6ov (source-typed confidence), workspace-4ix (truth repo), workspace-iit (provenance chain)
+- **provenance skill:** `skills/provenance/` — reasoning path tracking, chain-of-thought visibility
+- **memory-plex skill:** `skills/memory-plex/` — organized memory stores (facts, recent, learn, context)
+- **self-critic skill:** `skills/self-critic/` — risk analysis and self-critique of own outputs
+- **experiment skill:** `skills/experiment/` — scientific method, hypothesis testing, comparison
+- **Beads issues:** workspace-mr0 (calibration), workspace-6ov (source-typed confidence), workspace-4ix (truth repo - done), workspace-iit (provenance chain)
 
 ### Current Setup
 - **Security scans** — clarity map: `2026-04-21-security-scans.md`
