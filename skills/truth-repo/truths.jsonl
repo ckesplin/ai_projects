@@ -10,3 +10,8 @@
 {"key":"workspace_path","value":"/home/clawbot/.openclaw/workspace","source":"AGENTS.md","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
 {"key":"skills_count","value":"9 (calibration, experiment, memory-plex, plan, provenance, self-critic, transparency, truth-repo, verify-workflow)","source":"ls skills/ directory verified at 2026-04-24T16:38:00Z","type":"VERIFIED","created_at":"2026-04-24T16:38:00Z"}
 {"key":"verify_workflow_created","value":"2026-04-24T16:38:00Z","source":"SKILL.md created","type":"VERIFIED","created_at":"2026-04-24T16:38:00Z"}
+{"key":"git_remote_url","value":"https://github.com/ckesplin/ai_projects.git","source":"git remote -v","type":"VERIFIED","created_at":"2026-04-24T16:40:00Z"}
+{"key":"git_branch","value":"master (local and remote)","source":"git branch -a","type":"VERIFIED","created_at":"2026-04-24T16:40:00Z"}
+{"key":"openclaw_skills_count","value":"9","source":"ls skills/ | wc -l","type":"VERIFIED","created_at":"2026-04-24T16:40:00Z"}
+{"key":"calibration_system","value":"working - track.py functional","source":"python3 track.py score","type":"VERIFIED","created_at":"2026-04-24T16:40:00Z"}
+{"key":"verify_workflow_created","value":"2026-04-24T16:38:00Z","source":"SKILL.md created","type":"VERIFIED","created_at":"2026-04-24T16:40:00Z"}
