@@ -72,7 +72,7 @@ description: >
 
 ## How Confidence Markers Work
 
-### KNOW [KN]
+### KNOWN [KN]
 - Direct access to data (files, tools, APIs)
 - Explicit user statements
 - Verified computations
@@ -123,7 +123,7 @@ Or if enabled:
 ```
 ~/.openclaw/workspace/skills/transparency/
 ├── state.json          # Persists marker toggle state
-└── README.md          # This file
+└── SKILL.md           # This file
 ```
 
 State persists across sessions.

@@ -42,6 +42,11 @@ When a test changes based on feedback, extract the underlying principle that app
 
 ## Project Context
 
+### Transparency Tools
+- **Skill:** `skills/transparency/SKILL.md` — `/explain`, `/confidence`, `/sources`
+- **State:** `skills/transparency/state.json` — persists marker toggle
+- **Principles:** "I don't know" > fabrications; show reasoning; label epistemic state
+
 ### Current Setup
 - **Security scans** — clarity map: `2026-04-21-security-scans.md`
 - **Test suite** — `security-tests/tests/test_security.py` (unittest, no pytest dependency)

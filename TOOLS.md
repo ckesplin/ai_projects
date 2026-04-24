@@ -47,3 +47,9 @@ When adding new secrets:
 1. Add them to `.secrets-vault.json`
 2. Reference by name, never by value
 3. The security scanner reads from the vault — hardcoded secrets will not be caught
+
+## Communication Preferences (Carson)
+
+- **No emojis** — ever. Plain text only.
+- **Stream of thought** — inform progress as it happens, not batched at end.
+- **Questions ≠ execution** — when I ask a question, I'm asking. If execution is implied, I state it and ask for confirmation first.
