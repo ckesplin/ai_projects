@@ -1,0 +1,10 @@
+{
+  "initialized_at": "2026-04-24T16:38:00Z",
+  "claims_verified": 1,
+  "claims_inferred": 0,
+  "claims_rejected": 0,
+  "claims_contradicted": 1,
+  "last_verification": "2026-04-24T16:38:00Z",
+  "workflow": "verification-first",
+  "verification_log": "verification_log.jsonl"
+}

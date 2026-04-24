@@ -1,10 +1,12 @@
-{"key":"test_claim_1","value":"Chinese characters appeared in output 2026-04-24","source":"Pacolicious report","type":"VERIFIED","created_at":"2026-04-24T05:04:00Z"}
-{"key":"web_search_provider","value":"ollama (local)","source":"openclaw.json config","type":"VERIFIED","created_at":"2026-04-24T05:04:00Z"}
-{"key":"web_search_provider","value":"ollama (local)","source":"openclaw.json config","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
 {"key":"chinese_chars_bug","value":"Occurred 2026-04-24","source":"USER.md report","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
 {"key":"model","value":"minimax-m2.7:cloud","source":"openclaw.json config","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
 {"key":"ollama_running","value":"true","source":"curl test 127.0.0.1:11434","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
-{"key":"skills_created","value":"8 (transparency, truth-repo, calibration, provenance, memory-plex, self-critic, experiment, plan)","source":"ls skills/","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
 {"key":"openclaw_version","value":"2026.4.22","source":"openclaw --version output","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
-{"key":"workspace_path","value":"/home/clawbot/.openclaw/workspace","source":"AGENTS.md","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
+{"key":"skills_created","value":"8 (transparency, truth-repo, calibration, provenance, memory-plex, self-critic, experiment, plan)","source":"ls skills/","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
+{"key":"test_claim_1","value":"Chinese characters appeared in output 2026-04-24","source":"Pacolicious report","type":"VERIFIED","created_at":"2026-04-24T05:04:00Z"}
 {"key":"user_timezone","value":"Mountain Time (MST/MDT)","source":"USER.md","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
+{"key":"web_search_provider","value":"ollama (local)","source":"openclaw.json config","type":"VERIFIED","created_at":"2026-04-24T05:04:00Z"}
+{"key":"web_search_provider","value":"ollama (local)","source":"openclaw.json config","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
+{"key":"workspace_path","value":"/home/clawbot/.openclaw/workspace","source":"AGENTS.md","type":"VERIFIED","created_at":"2026-04-24T05:20:00Z"}
+{"key":"skills_count","value":"9 (calibration, experiment, memory-plex, plan, provenance, self-critic, transparency, truth-repo, verify-workflow)","source":"ls skills/ directory verified at 2026-04-24T16:38:00Z","type":"VERIFIED","created_at":"2026-04-24T16:38:00Z"}
+{"key":"verify_workflow_created","value":"2026-04-24T16:38:00Z","source":"SKILL.md created","type":"VERIFIED","created_at":"2026-04-24T16:38:00Z"}

@@ -2,7 +2,8 @@
 
 **Date:** 2026-04-24  
 **Status:** In Progress (24h test started 05:19 UTC)  
-**Expected completion:** 2026-04-25 05:19 UTC
+**Expected completion:** 2026-04-25 05:19 UTC  
+**Last updated:** 2026-04-24 06:45 UTC
 
 ---
 
@@ -20,11 +21,11 @@ Building a transparency and epistemic clarity system to increase trust between A
 |:---|:---|:---|:---|
 | 1 | Core commands work (/explain, /confidence, /sources) | All respond | In Progress |
 | 2 | User can invoke commands | Without assistance | Pending |
-| 3 | Truth repo populated | 10+ verified facts | DONE (10) |
+| 3 | Truth repo populated | 10+ verified facts | DONE (10 in truths.jsonl) |
 | 4 | Unknown reduction tracked | Logged and resolved | Not started |
 | 5 | Self-critic auto-triggers | On HIGH confidence | In Progress |
 | 6 | Calibration score | > 70% | Pending outcomes |
-| 7 | Zero hallucination incidents | 24h test | IN PROGRESS |
+| 7 | Zero hallucination incidents | 24h test | IN PROGRESS (~22.5h remaining) |
 
 ---
 
@@ -34,13 +35,14 @@ Building a transparency and epistemic clarity system to increase trust between A
 
 | Skill | Purpose | Status |
 |:---|:---|:---|
-| `transparency` | `/explain`, `/confidence`, `/sources` | Active, toggle works |
-| `truth-repo` | Persistent verified facts, temp assumptions | 10 facts stored |
-| `calibration` | Prediction/outcome tracking | 2 predictions logged |
-| `provenance` | Reasoning path chains with risk tags | 2 chains recorded |
-| `memory-plex` | Organized memory stores (facts, recent, learn, context) | Initial data loaded |
+| `transparency` | `/explain`, `/confidence`, `/sources` | Active |
+| `truth-repo` | Persistent verified facts, temp assumptions | 10 truths, 0 temp |
+| `calibration` | Prediction/outcome tracking | 0 predictions recorded |
+| `provenance` | Reasoning path chains with risk tags | 0 chains recorded |
+| `memory-plex` | Organized memory stores (facts, recent, learn, context) | 1 recent, 1 learn, 1 context |
 | `self-critic` | Risk analysis and self-critique | Auto-trigger config ready |
-| `experiment` | Scientific method framework | 1 experiment running |
+| `experiment` | Scientific method framework | No experiments |
+| `plan` | Planning skill | Present |
 
 ### Beads Issues
 
@@ -52,78 +54,88 @@ Building a transparency and epistemic clarity system to increase trust between A
 
 ---
 
-## Truth Repository Contents (10 facts)
+## Truth Repository Contents
 
-1. `web_search_provider` — ollama (local)
-2. `chinese_chars_bug` — Occurred 2026-04-24
-3. `model` — minimax-m2.7:cloud
-4. `ollama_running` — true
-5. `skills_created` — 8 skills
-6. `openclaw_version` — 2026.4.22
-7. `workspace_path` — /home/clawbot/.openclaw/workspace
-8. `user_timezone` — Mountain Time
-9. `test_claim_1` — Chinese chars appeared in output (VERIFIED)
-10. `web_search_provider_recheck` — ollama (local, confirmed via curl)
+*(Re-counted from truths.jsonl at 06:45 UTC)*
+
+```
+$ wc -l truths.jsonl
+10 truths.jsonl
+$ wc -l temp.jsonl
+0 temp.jsonl
+```
+
+**Temp assumptions:** 0 (temp.jsonl empty)
 
 ---
 
 ## Calibrated Predictions
 
+*(state.json counters at 06:45 UTC — all zero)*
+
 | ID | Statement | Confidence | Created |
 |:---|:---|:---|:---|
-| pred_001 | Confidence markers reduce hallucination | MEDIUM | 2026-04-24T05:04:00Z |
-| pred_002 | 24h test will complete with zero incidents | MEDIUM | 2026-04-24T05:20:00Z |
+| — | None recorded yet | — | — |
+
+**Calibration score:** N/A (no predictions to score)
 
 ---
 
-## Experiment Status
+## Provenance Chains
 
-| Name | Hypothesis | Status |
-|:---|:---|:---|
-| exp_001_provenance_test | Provenance chains improve user trust | Running |
-
----
-
-## Self-Critique Findings
-
-**Test claim:** "Truth repo count: 10 facts"
-
-| Check | Result |
-|:---|:---|
-| Hallucination risk | LOW (counted via wc -l) |
-| Assumption bleed | LOW |
-| Alternative interpretations | Possible off-by-one |
-| Verdict | SUPPORTED |
-
----
-
-## Risk Factors Identified
-
-1. **Overengineering** — 8 skills for initial request. May simplify.
-2. **Untested commands** — `/truth`, `/remember` defined but not invoked by user
-3. **Self-critic limitations** — Can only catch what it can detect
-4. **Context window** — Large skill set may cause bloat
+**Count:** 0 (chains.json empty at 06:45 UTC)
 
 ---
 
 ## Memory Stores
 
-| Store | Content | TTL |
-|:---|:---|:---|
-| facts | Verified truths | never |
-| recent | Chinese char bug event | 24h |
-| learn | Confidence marker lesson | never |
-| context | Current project: trust-building | 8h |
+| Store | File | Content | TTL | Status |
+|:---|:---|:---|:---|:---|
+| facts | facts.store | (empty) | never | EMPTY |
+| recent | recent.store | Chinese char bug event (2026-04-24) | 24h | 1 entry |
+| learn | learn.store | "Confidence markers must be grounded in verification" | never | 1 entry |
+| context | context.store | Current project: trust-building | 8h | present |
+
+**facts.store is empty** — persistent facts not yet written to memory-plex (truths live in truth-repo only).
 
 ---
 
-## 24h Test Protocol
+## Transparency System
 
-1. Log all factual claims starting 05:19 UTC
-2. Self-critic runs on each HIGH confidence claim
-3. User probes with `/explain` or `/sources`
-4. Wrong confirmations = incidents
-5. Report at 2026-04-25 05:19 UTC
+**Confidence markers:** DISABLED  
+*(confidence_markers_enabled = false in state.json)*
+
+---
+
+## Experiment System
+
+**Experiments:** 0 active  
+*(state.json: experiment_count = 0, active_experiment = null)*
+
+---
+
+## Self-Critique Findings
+
+No findings recorded yet (self-critic has not triggered).
+
+---
+
+## 24h Test Status
+
+**Started:** 2026-04-24 05:19 UTC  
+**Current:** 2026-04-24 06:45 UTC  
+**Remaining:** ~22.5 hours  
+**Incidents:** 0
+
+---
+
+## Corrective Actions Needed
+
+- [ ] Populate facts.store in memory-plex (currently empty)
+- [ ] Record provenance chains when making claims
+- [ ] Enable and test confidence markers
+- [ ] Log first calibration prediction
+- [ ] User needs to invoke `/explain`, `/confidence`, `/sources` to verify commands work
 
 ---
 
@@ -139,11 +151,12 @@ Building a transparency and epistemic clarity system to increase trust between A
 
 ## Lessons Learned
 
-1. Confidence markers must be grounded in verification, not self-assessment
-2. "I don't know" is an opportunity to gain information
+1. **Confidence markers must be grounded in verification** — not self-assessment
+2. "I don't know" is an opportunity to gain information, not a failure
 3. Self-critic can only catch detectable errors — user backstop essential
-4. Speed of truth improves as repo grows with cross-referenced facts
+4. **Report data goes stale fast** — must re-read actual state files, not trust the doc
+5. **facts.store is empty** — memory-plex "facts" store was never populated; truths live in truth-repo
 
 ---
 
-*Report will be updated at 24h test completion (2026-04-25 05:19 UTC)*
+*Report updated at 24h test completion (2026-04-25 05:19 UTC)*
