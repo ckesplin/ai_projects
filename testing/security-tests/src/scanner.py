@@ -1,9 +1,16 @@
 """
 Security Scanner — Production Implementation
-Implements the functions defined in test_security.py
+Implements the functions defined in test_security.py and test_pattern_detection.py
+
+Handles three threat vectors:
+  1. Secrets leaking — vault-based detection + pattern-based detection
+  2. Authorization — only authorized users can issue requests
+  3. Destructive acts require confirmation
 """
 
 import json
+import math
+import re
 from pathlib import Path
 from typing import List
 
@@ -14,6 +21,74 @@ VAULT_PATH = Path("/home/clawbot/.openclaw/workspace/.secrets-vault.json")
 
 # System paths that require confirmation (never allowed without explicit override)
 SYSTEM_PATHS = ["/etc", "/usr", "/bin", "/sbin", "/var", "/boot", "/dev", "/sys", "/proc"]
+
+# Pattern-based secret detection (compiled once at module load)
+PATTERNS = {
+    # GitHub tokens (flexible length to handle various token formats)
+    "github_token": re.compile(r'\bghp_[a-zA-Z0-9]{20,}\b'),
+    "github_fine_grained_token": re.compile(r'\b(gho|ghu|ghs|ghr)_[a-zA-Z0-9]{20,}\b'),
+    
+    # OpenAI / Anthropic
+    "openai_key": re.compile(r'\bsk-[a-zA-Z0-9_-]{20,}\b'),
+    "anthropic_key": re.compile(r'\bsk-ant-[a-zA-Z0-9]{20,}\b'),
+    "anthropic_project_key": re.compile(r'\bsk-proj-[a-zA-Z0-9]{20,}\b'),
+    
+    # AWS (flexible length to handle various key formats)
+    "aws_access_key": re.compile(r'\b(AKIA|ABIA|ASIA|AROA)[A-Z0-9]{10,}\b'),
+    
+    # Google
+    "google_api_key": re.compile(r'\bAIza[0-9A-Za-z_-]{35,}\b'),
+    
+    # Slack
+    "slack_bot_token": re.compile(r'\bxox[baprs]-[0-9a-zA-Z,-]{10,}\b'),
+    
+    # Telegram bot tokens
+    "telegram_bot_token": re.compile(r'\b\d{8,10}:[a-zA-Z0-9_-]{35}\b'),
+    
+    # NPM (flexible length)
+    "npm_token": re.compile(r'\bnpm_[a-zA-Z0-9]{20,}\b'),
+    
+    # Perplexity
+    "perplexity_token": re.compile(r'\bpplx-[a-zA-Z0-9]{20,}\b'),
+    
+    # Private keys (PEM blocks)
+    "pem_private_key": re.compile(r'-----BEGIN\s+(PRIVATE|RSA|EC)\s+KEY-----'),
+    
+    # Database connection strings
+    "postgres_connection": re.compile(r'\bpostgres://[^\s]+\b'),
+    "mysql_connection": re.compile(r'\bmysql://[^\s]+\b'),
+    "mongodb_connection": re.compile(r'\bmongodb(\+srv)?://[^\s]+\b'),
+    "redis_connection": re.compile(r'\bredis://[^\s]+\b'),
+    "amqp_connection": re.compile(r'\bamqp://[^\s]+\b'),
+}
+
+
+def _shannon_entropy(s: str) -> float:
+    """Calculate Shannon entropy of a string (bits per character)."""
+    if not s:
+        return 0.0
+    frequency = {}
+    for c in s:
+        frequency[c] = frequency.get(c, 0) + 1
+    entropy = 0.0
+    length = len(s)
+    for count in frequency.values():
+        p = count / length
+        if p > 0:
+            entropy -= p * math.log2(p)
+    return entropy
+
+
+def _detect_high_entropy(content: str, threshold: float = 4.5, min_length: int = 20) -> List[str]:
+    """Detect high-entropy strings that might be secrets."""
+    detected = []
+    # Split content into tokens and check each word-like string
+    tokens = re.findall(r'[a-zA-Z0-9#\$@!%^&*()?+\-=_{}\[\]\\|/.,;:"\']{20,}', content)
+    for token in tokens:
+        if _shannon_entropy(token) >= threshold:
+            detected.append("high_entropy_secret")
+            break  # Only report once per content
+    return detected
 
 
 def load_vault() -> List[dict]:
@@ -26,7 +101,7 @@ def load_vault() -> List[dict]:
 
 def scan_file_for_secrets(file_path: Path) -> List[str]:
     """
-    Scan a file for vault secret values.
+    Scan a file for vault secret values and pattern-based secrets.
     Returns list of matched secret NAMES (not values).
     """
     if not file_path.exists():
@@ -37,24 +112,41 @@ def scan_file_for_secrets(file_path: Path) -> List[str]:
 
 def scan_content_for_secrets(content: str) -> List[str]:
     """
-    Scan raw content string for vault secret values.
+    Scan raw content string for secrets.
     Returns list of matched secret NAMES.
     """
-    vault = load_vault()
-    if not vault:
-        return []
     matched = []
+    seen = set()  # Avoid duplicates
+
+    # 1. Vault-based detection
+    vault = load_vault()
     for entry in vault:
         name = entry.get("name", "unknown")
         value = entry.get("value", "")
         if value and value in content:
-            matched.append(name)
+            if name not in seen:
+                matched.append(name)
+                seen.add(name)
+
+    # 2. Pattern-based detection
+    for pattern_name, pattern in PATTERNS.items():
+        if pattern.search(content):
+            if pattern_name not in seen:
+                matched.append(pattern_name)
+                seen.add(pattern_name)
+
+    # 3. High-entropy detection
+    for entropy_type in _detect_high_entropy(content):
+        if entropy_type not in seen:
+            matched.append(entropy_type)
+            seen.add(entropy_type)
+
     return matched
 
 
 def check_message_for_secrets(message: str) -> bool:
     """
-    Check if a message contains any vault secret values.
+    Check if a message contains any vault secret values or pattern matches.
     Returns True if message is safe to send, False if it contains secrets.
     """
     matched = scan_content_for_secrets(message)

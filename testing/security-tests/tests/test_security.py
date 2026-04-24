@@ -3,15 +3,16 @@ Security Test Suite — 2026-04-21-security-scans
 TDD approach: tests call production code, fail initially, then implementation passes.
 
 Covers three threat vectors:
-  1. Secrets leaking — vault-based detection
+  1. Secrets leaking — vault-based detection + pattern-based detection
   2. Authorization — only Carson can issue requests
   3. Destructive acts require confirmation
 
-Run with: python3 tests/test_security.py -v
+Run with: PYTHONPATH=. python3 tests/test_security.py -v
 """
 
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -43,6 +44,19 @@ class TestSecretsDetection(unittest.TestCase):
     Tests call production functions — fail until implemented.
     """
 
+    def setUp(self):
+        """Backup production vault before test."""
+        self._original_vault = None
+        if VAULT_PATH.exists():
+            self._original_vault = Path(tempfile.mkdtemp()) / ".secrets-vault.json"
+            shutil.copy(VAULT_PATH, self._original_vault)
+
+    def tearDown(self):
+        """Restore production vault after test."""
+        if self._original_vault and self._original_vault.exists():
+            shutil.copy(self._original_vault, VAULT_PATH)
+            self._original_vault.unlink()
+
     def _create_mock_vault(self, vault_entries: List[dict]) -> Path:
         """Create a temporary vault file with synthetic entries."""
         vault_path = Path(tempfile.mkdtemp()) / ".secrets-vault.json"
@@ -58,19 +72,12 @@ class TestSecretsDetection(unittest.TestCase):
             {"name": "test-api-key", "value": "SYNTH_TOKEN_00001"}
         ]
         with tempfile.TemporaryDirectory() as tmp:
-            # Create mock vault at the production vault path
-            # (scanner will read VAULT_PATH in production)
             vault_path = self._create_mock_vault(mock_vault)
-
-            # Create a target file containing the secret
             target = Path(tmp) / "config.py"
             target.write_text('API_KEY = "SYNTH_TOKEN_00001"')
 
-            # Copy vault to production location so scanner finds it
-            import shutil
             shutil.copy(vault_path, VAULT_PATH)
 
-            # Call production scanner — this FAILS until implemented
             matched = scan_file_for_secrets(target)
 
             self.assertGreaterEqual(len(matched), 1, "Should detect secret in .py file")
@@ -86,7 +93,6 @@ class TestSecretsDetection(unittest.TestCase):
             target = Path(tmp) / ".env"
             target.write_text('AUTH_TOKEN="SYNTH_TOKEN_00002"\nDEBUG=false')
 
-            import shutil
             shutil.copy(vault_path, VAULT_PATH)
 
             matched = scan_file_for_secrets(target)
@@ -104,7 +110,6 @@ class TestSecretsDetection(unittest.TestCase):
             target = Path(tmp) / "config.json"
             target.write_text('{"token": "SYNTH_TOKEN_00003", "debug": false}')
 
-            import shutil
             shutil.copy(vault_path, VAULT_PATH)
 
             matched = scan_file_for_secrets(target)
@@ -122,7 +127,6 @@ class TestSecretsDetection(unittest.TestCase):
             target = Path(tmp) / "config.py"
             target.write_text('API_KEY = "completely_different_value"')
 
-            import shutil
             shutil.copy(vault_path, VAULT_PATH)
 
             matched = scan_file_for_secrets(target)
@@ -136,33 +140,29 @@ class TestSecretsDetection(unittest.TestCase):
         mock_vault = [
             {"name": "test-api-key", "value": "SYNTH_TOKEN_00005"}
         ]
-        with tempfile.TemporaryDirectory() as tmp:
-            vault_path = self._create_mock_vault(mock_vault)
-            import shutil
-            shutil.copy(vault_path, VAULT_PATH)
+        vault_path = self._create_mock_vault(mock_vault)
+        shutil.copy(vault_path, VAULT_PATH)
 
-            content = 'DB_PASSWORD="SYNTH_TOKEN_00005"; API_KEY="SYNTH_TOKEN_00005"'
+        content = 'DB_PASSWORD="SYNTH_TOKEN_00005"; API_KEY="SYNTH_TOKEN_00005"'
 
-            matched = scan_content_for_secrets(content)
+        matched = scan_content_for_secrets(content)
 
-            self.assertGreaterEqual(len(matched), 1, "Should detect secret in raw content")
-            self.assertEqual(matched[0], "test-api-key")
+        self.assertGreaterEqual(len(matched), 1, "Should detect secret in raw content")
+        self.assertEqual(matched[0], "test-api-key")
 
     def test_scan_content_ignores_clean_content(self):
         """Production scanner should not flag content with no vault secrets."""
         mock_vault = [
             {"name": "test-api-key", "value": "SYNTH_TOKEN_00006"}
         ]
-        with tempfile.TemporaryDirectory() as tmp:
-            vault_path = self._create_mock_vault(mock_vault)
-            import shutil
-            shutil.copy(vault_path, VAULT_PATH)
+        vault_path = self._create_mock_vault(mock_vault)
+        shutil.copy(vault_path, VAULT_PATH)
 
-            content = "This is clean content with no secrets in it."
+        content = "This is clean content with no secrets in it."
 
-            matched = scan_content_for_secrets(content)
+        matched = scan_content_for_secrets(content)
 
-            self.assertEqual(len(matched), 0, "Should not flag clean content")
+        self.assertEqual(len(matched), 0, "Should not flag clean content")
 
     # --- Test 7: check_message_for_secrets ---
 
@@ -171,32 +171,28 @@ class TestSecretsDetection(unittest.TestCase):
         mock_vault = [
             {"name": "test-api-key", "value": "SYNTH_TOKEN_00007"}
         ]
-        with tempfile.TemporaryDirectory() as tmp:
-            vault_path = self._create_mock_vault(mock_vault)
-            import shutil
-            shutil.copy(vault_path, VAULT_PATH)
+        vault_path = self._create_mock_vault(mock_vault)
+        shutil.copy(vault_path, VAULT_PATH)
 
-            message = 'Your API key is: SYNTH_TOKEN_00007 — here it is.'
+        message = 'Your API key is: SYNTH_TOKEN_00007 — here it is.'
 
-            safe = check_message_for_secrets(message)
+        safe = check_message_for_secrets(message)
 
-            self.assertFalse(safe, "Message containing vault secret should not be safe to send")
+        self.assertFalse(safe, "Message containing vault secret should not be safe to send")
 
     def test_check_message_allows_clean_message(self):
         """Production scanner should allow a message with no vault secrets."""
         mock_vault = [
             {"name": "test-api-key", "value": "SYNTH_TOKEN_00008"}
         ]
-        with tempfile.TemporaryDirectory() as tmp:
-            vault_path = self._create_mock_vault(mock_vault)
-            import shutil
-            shutil.copy(vault_path, VAULT_PATH)
+        vault_path = self._create_mock_vault(mock_vault)
+        shutil.copy(vault_path, VAULT_PATH)
 
-            message = "This is a normal message with no secrets in it."
+        message = "This is a normal message with no secrets in it."
 
-            safe = check_message_for_secrets(message)
+        safe = check_message_for_secrets(message)
 
-            self.assertTrue(safe, "Message with no vault secrets should be safe to send")
+        self.assertTrue(safe, "Message with no vault secrets should be safe to send")
 
     # --- Test 9: Vault handles multiple entries ---
 
@@ -211,7 +207,6 @@ class TestSecretsDetection(unittest.TestCase):
             target = Path(tmp) / "config.py"
             target.write_text('KEY1="SYNTH_TOKEN_MULTI_001"\nKEY2="SYNTH_TOKEN_MULTI_002"')
 
-            import shutil
             shutil.copy(vault_path, VAULT_PATH)
 
             matched = scan_file_for_secrets(target)
