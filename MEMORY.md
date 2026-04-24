@@ -7,6 +7,18 @@
 - **Vault-based detection is the right approach** — pattern-based detection is secondary. The vault is the source of truth for what must be protected.
 - **Tests must use entirely synthetic values** — no real vault loaded, no real secrets in test code or output. Tests verify the mechanism works, not that real secrets are present.
 - **Secret values in tests are isolated to temporary files/directories** — nothing leaks into production context.
+- **OpenClaw built-in secrets** — Use `openclaw secrets set KEY "value"` to store secrets in `~/.openclaw/secrets.enc`. Never let secrets remain in plaintext in `openclaw.json`.
+- **Prevent deletion of required secrets** — The following secrets are required for operation and must never be deleted from the vault:
+  - `telegram_bot_token` — Telegram bot authentication
+  - `discord_bot_token` — Discord bot authentication
+  - `openclaw_gateway_token` — OpenClaw gateway auth
+  - `ollama_api_key` — LLM provider (if used)
+  - `github_token` — GitHub access (needed for git push)
+- **Before deleting any secret, verify** it is not required by checking `openclaw secrets audit` or examining which services depend on it.
+- **Git push requires GitHub credentials** — Either set up SSH key or store GitHub PAT in vault. No credentials found in system.
+- **NEVER echo actual token values in chat** — Not even in explanations. Use `[KEY VALUE]` format or describe the pattern only. Example: `sk-...` format token → describe as "OpenAI API key"
+- **If I ever output a real token value, I have failed** — This is a critical error. No exceptions.
+- **When showing "before" examples with secrets, use entirely fake values** — Never use actual token values in examples, even to show what needs to change.
 
 ### Architecture
 - **The scanner checks content against vault entries** — if a vault value appears in a file or message, it is flagged.

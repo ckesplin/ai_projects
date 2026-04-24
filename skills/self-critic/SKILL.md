@@ -67,6 +67,11 @@ Run this before any HIGH confidence output:
 - [ ] Is this claim based on session-only memory?
 - [ ] Should this go to truth repo for persistence?
 
+**Secret check (CRITICAL):**
+- [ ] Does this output contain any real token values, API keys, or secrets?
+- [ ] Am I about to echo a value from the vault or config?
+- [ ] If yes to any above → STOP. Rewrite to use [KEY VALUE] format or describe the pattern only.
+
 **Confidence check:**
 - [ ] Is HIGH confidence appropriate?
 - [ ] What would make me downgrade to MEDIUM?
