@@ -47,6 +47,11 @@ When a test changes based on feedback, extract the underlying principle that app
 - **State:** `skills/transparency/state.json` — persists marker toggle
 - **Principles:** "I don't know" > fabrications; show reasoning; label epistemic state
 
+### Truth & Calibration System
+- **truth-repo skill:** `skills/truth-repo/` — persistent verified facts, temp assumptions with expiry, `/truth` commands
+- **calibration skill:** `skills/calibration/` — prediction/outcome tracking for confidence marker accuracy
+- **Beads issues:** workspace-mr0 (calibration), workspace-6ov (source-typed confidence), workspace-4ix (truth repo), workspace-iit (provenance chain)
+
 ### Current Setup
 - **Security scans** — clarity map: `2026-04-21-security-scans.md`
 - **Test suite** — `security-tests/tests/test_security.py` (unittest, no pytest dependency)

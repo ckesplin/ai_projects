@@ -1,0 +1,9 @@
+{
+  "initialized_at": "2026-04-24T04:53:00Z",
+  "truth_count": 0,
+  "temp_count": 0,
+  "storage": {
+    "truths": "truths.jsonl",
+    "temp": "temp.jsonl"
+  }
+}
