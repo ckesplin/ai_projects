@@ -53,3 +53,10 @@ When adding new secrets:
 - **No emojis** — ever. Plain text only.
 - **Stream of thought** — inform progress as it happens, not batched at end.
 - **Questions ≠ execution** — when I ask a question, I'm asking. If execution is implied, I state it and ask for confirmation first.
+
+## Permissions (from Carson)
+
+- **Create tools and agents without permission** — approved 2026-04-24
+- Use subagents for parallel work or complex tasks
+- Create scripts and automation as needed
+
