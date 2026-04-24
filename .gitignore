@@ -1,0 +1,22 @@
+# Secrets — never commit
+secrets/
+
+# OpenClaw runtime — contains credentials and tokens
+.openclaw/
+
+# Runtime state
+state/
+memory/
+
+# Logs
+*.log
+
+# OS artifacts
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Editor directories
+.vscode/
+.idea/

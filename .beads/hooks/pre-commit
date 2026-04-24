@@ -1,0 +1,113 @@
+#!/bin/bash
+# Pre-commit security scan
+# Scans staged files for vault secrets before commit is allowed
+
+VAULT_FILE="/home/clawbot/.openclaw/workspace/secrets/.secrets-vault.json"
+
+# Check if vault exists and is non-empty
+if [ ! -f "$VAULT_FILE" ]; then
+    echo "No vault file — skipping scan"
+    exit 0
+fi
+
+python3 << 'PYEOF'
+import sys
+import json
+import subprocess
+import os
+
+vault_path = "/home/clawbot/.openclaw/workspace/secrets/.secrets-vault.json"
+workspace = "/home/clawbot/.openclaw/workspace"
+
+# Load vault
+try:
+    with open(vault_path) as f:
+        vault = json.load(f)
+except Exception as e:
+    print(f"Could not load vault: {e}")
+    sys.exit(0)  # Don't block commit if vault can't be read
+
+if not vault:
+    print("Vault is empty — skipping scan")
+    sys.exit(0)
+
+# Get list of staged files (files to be committed, not vault files)
+try:
+    result = subprocess.run(
+        ["git", "diff", "--cached", "--name-only", "--diff-filter=ACM"],
+        capture_output=True, text=True, cwd=workspace
+    )
+    staged_files = [f.strip() for f in result.stdout.strip().split("\n") if f.strip()]
+except Exception as e:
+    print(f"Could not get staged files: {e}")
+    sys.exit(1)
+
+if not staged_files:
+    print("No files staged — skipping scan")
+    sys.exit(0)
+
+secrets_found = []
+
+for file_path in staged_files:
+    # Skip the secrets directory itself — never scan vault files
+    if file_path.startswith("secrets/") or file_path.startswith("secrets/"):
+        continue
+    
+    # Skip binary files
+    skip_exts = [".png", ".jpg", ".gif", ".pdf", ".zip", ".tar", ".gz", ".pem", ".key"]
+    if any(file_path.endswith(ext) for ext in skip_exts):
+        continue
+    
+    full_path = os.path.join(workspace, file_path)
+    
+    if not os.path.isfile(full_path):
+        continue
+    
+    try:
+        with open(full_path, "r", errors="ignore") as f:
+            content = f.read()
+    except Exception:
+        continue
+    
+    # Scan content for vault secrets
+    for entry in vault:
+        value = entry.get("value", "")
+        name = entry.get("name", "unknown")
+        if value and value in content:
+            secrets_found.append(f"  {file_path}: contains secret '{name}'")
+
+if secrets_found:
+    print("\n=== SECURITY SCAN FAILED ===")
+    print("Vault secrets detected in staged files:")
+    for s in secrets_found:
+        print(s)
+    print("\nCommit blocked.")
+    sys.exit(1)
+else:
+    print("Security scan passed")
+    sys.exit(0)
+PYEOF
+
+# --- BEGIN BEADS INTEGRATION v1.0.2 ---
+# This section is managed by beads. Do not remove these markers.
+if command -v bd >/dev/null 2>&1; then
+  export BD_GIT_HOOK=1
+  _bd_timeout=${BEADS_HOOK_TIMEOUT:-300}
+  if command -v timeout >/dev/null 2>&1; then
+    timeout "$_bd_timeout" bd hooks run pre-commit "$@"
+    _bd_exit=$?
+    if [ $_bd_exit -eq 124 ]; then
+      echo >&2 "beads: hook 'pre-commit' timed out after ${_bd_timeout}s — continuing without beads"
+      _bd_exit=0
+    fi
+  else
+    bd hooks run pre-commit "$@"
+    _bd_exit=$?
+  fi
+  if [ $_bd_exit -eq 3 ]; then
+    echo >&2 "beads: database not initialized — skipping hook 'pre-commit'"
+    _bd_exit=0
+  fi
+  if [ $_bd_exit -ne 0 ]; then exit $_bd_exit; fi
+fi
+# --- END BEADS INTEGRATION v1.0.2 ---
