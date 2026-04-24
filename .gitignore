@@ -37,3 +37,4 @@ build/
 tmp/
 temp-*
 *.tmp
+.secrets-vault.json
