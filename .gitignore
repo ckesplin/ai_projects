@@ -20,3 +20,20 @@ memory/
 # Editor directories
 .vscode/
 .idea/
+
+# Dependencies
+node_modules/
+
+# Build artifacts
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+tmp/
+temp-*
+*.tmp
