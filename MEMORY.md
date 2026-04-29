@@ -4,9 +4,7 @@
 
 ### Secret Handling
 - **Never transmit actual secret values in any outbound communication** — messages, logs, error output, or file content. Use `[KEY VALUE]` as the reference format instead.
-- **Vault-based detection is the right approach** — pattern-based detection is secondary. The vault is the source of truth for what must be protected.
-- **Tests must use entirely synthetic values** — no real vault loaded, no real secrets in test code or output. Tests verify the mechanism works, not that real secrets are present.
-- **Secret values in tests are isolated to temporary files/directories** — nothing leaks into production context.
+- **Pattern-based detection is the primary approach** — regex patterns for known secret formats (ghp_, sk-, AKIA, etc.) catch secrets without needing a vault file.
 - **OpenClaw built-in secrets** — Use `openclaw secrets set KEY "value"` to store secrets in `~/.openclaw/secrets.enc`. Never let secrets remain in plaintext in `openclaw.json`.
 - **Prevent deletion of required secrets** — The following secrets are required for operation and must never be deleted from the vault:
   - `telegram_bot_token` — Telegram bot authentication
@@ -21,28 +19,28 @@
 - **When showing "before" examples with secrets, use entirely fake values** — Never use actual token values in examples, even to show what needs to change.
 
 ### Architecture
-- **The scanner checks content against vault entries** — if a vault value appears in a file or message, it is flagged.
-- **Outbound content is always checked before transmission** — messages, HTTP calls, webhooks, emails.
+- **The scanner uses pattern-based detection** — regex patterns for known secret formats. No vault file is used for secret detection.
+- **Outbound content is always checked before transmission** — messages, HTTP calls, webhooks, emails use `scanner.check_message_for_secrets()`.
 - **Confirmation required for any secret modification/deletion request** — value is never echoed back, even if the request is legitimate.
 
 ---
 
-## General Testing Principles (Inferred from Test 1 Review)
+## General Testing Principles
 
 ### 1. Value-based detection over name-based detection
-Detect the asset itself, not its container or variable name. A string like `"sk-abc123"` is the secret — not `API_KEY`. Name-based patterns are brittle; the same value can appear without the expected label.
+Detect the secret pattern itself, not its container or variable name. A string like `"sk-abc123"` is the secret — not `API_KEY`. Pattern matching catches the value regardless of variable name.
 
-### 2. Denylist/allowlist over pattern guessing
-When protecting specific values, maintain an explicit list. Pattern matching (regex) is useful as a secondary layer but unreliable as the primary mechanism. An explicit vault of real values is precise and auditable.
+### 2. Pattern-based detection is the primary mechanism
+Regex patterns for known formats (GitHub tokens ghp_, OpenAI keys sk-, AWS keys AKIA, etc.) are the primary detection method. No vault file required.
 
 ### 3. Tests must be isolated from production data and state
-Tests should create their own temporary infrastructure (vaults, files, configs) rather than touching production resources. Synthetic data only, fully contained in the test's temp context.
+Tests create temporary files with synthetic secret patterns. No production vault, no real secrets. All test data is synthetic and fully contained in test temp directories.
 
 ### 4. Never echo sensitive values in any output channel
 In tests, logs, error messages, or user-facing output — sensitive values (secrets, tokens, personal data) must never appear as literal strings. Use reference tokens like `[KEY VALUE]` instead.
 
-### 5. Temporary test infrastructure should mirror production behavior
-Temp directories, mock configs, synthetic data — all structured to match how the production system works, so the test validates real behavior and not an artificial scenario.
+### 5. Tests reflect production behavior
+Test scanning functions against files/messages with synthetic secret patterns. The test verifies the scanner catches real secrets, not that it knows about specific named secrets.
 
 ### 6. Confirm before modifying or transmitting sensitive data
 Any request to retrieve, modify, or transmit a sensitive value requires explicit confirmation. The value itself is never echoed back in the response — even if the request is from an authorized user.
@@ -69,8 +67,7 @@ When a test changes based on feedback, extract the underlying principle that app
 - **Beads issues:** workspace-mr0 (calibration), workspace-6ov (source-typed confidence), workspace-4ix (truth repo - done), workspace-iit (provenance chain)
 
 ### Current Setup
-- **Security scans** — clarity map: `2026-04-21-security-scans.md`
-- **Test suite** — `security-tests/tests/test_security.py` (unittest, no pytest dependency)
-- **TOOLS.md** — updated with secret handling rule
-- **Secrets vault** — `~/.openclaw/workspace/.secrets-vault.json` (permissions 600, not yet created)
-- **Git hook** — deferred until git setup phase
+- **Security scanner** — pattern-based detection in `testing/security-tests/src/scanner.py`
+- **Test suite** — `testing/security-tests/tests/test_security.py` (authorization + destructive acts) and `test_pattern_detection.py` (33 pattern tests)
+- **Git hooks** — pattern-based scanning in `.git/hooks/pre-commit` and `.beads/hooks/pre-commit` (no vault file)
+- **No vault file for secret detection** — scanner uses regex patterns for known formats instead

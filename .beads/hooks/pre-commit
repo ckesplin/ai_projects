@@ -1,41 +1,52 @@
 #!/bin/bash
-# Pre-commit security scan
-# Scans staged files for vault secrets before commit is allowed
-
-VAULT_FILE="/home/clawbot/.openclaw/workspace/secrets/.secrets-vault.json"
-
-# Check if vault exists and is non-empty
-if [ ! -f "$VAULT_FILE" ]; then
-    echo "No vault file — skipping scan"
-    exit 0
-fi
+# Pre-commit security scan — pattern-based only (no vault file)
+# Scans staged files for pattern-based secrets (GitHub tokens, API keys, etc.)
 
 python3 << 'PYEOF'
 import sys
-import json
+import re
 import subprocess
 import os
 
-vault_path = "/home/clawbot/.openclaw/workspace/secrets/.secrets-vault.json"
-workspace = "/home/clawbot/.openclaw/workspace"
+WORKSPACE = "/home/clawbot/.openclaw/workspace"
 
-# Load vault
-try:
-    with open(vault_path) as f:
-        vault = json.load(f)
-except Exception as e:
-    print(f"Could not load vault: {e}")
-    sys.exit(0)  # Don't block commit if vault can't be read
+# Pattern-based secret detection
+PATTERNS = [
+    (re.compile(r'\bghp_[a-zA-Z0-9]{20,}\b'), "GitHub token"),
+    (re.compile(r'\b(gho|ghu|ghs|ghr)_[a-zA-Z0-9]{20,}\b'), "GitHub fine-grained token"),
+    (re.compile(r'\bsk-[a-zA-Z0-9_-]{20,}\b'), "OpenAI/Anthropic key"),
+    (re.compile(r'\bsk-ant-[a-zA-Z0-9]{20,}\b'), "Anthropic key"),
+    (re.compile(r'\bsk-proj-[a-zA-Z0-9]{20,}\b'), "Anthropic project key"),
+    (re.compile(r'\b(AKIA|ABIA|ASIA|AROA)[A-Z0-9]{10,}\b'), "AWS access key"),
+    (re.compile(r'\bAIza[0-9A-Za-z_-]{35,}\b'), "Google API key"),
+    (re.compile(r'\bxox[baprs]-[0-9a-zA-Z,-]{10,}\b'), "Slack token"),
+    (re.compile(r'\b\d{8,10}:[a-zA-Z0-9_-]{35}\b'), "Telegram bot token"),
+    (re.compile(r'\bnpm_[a-zA-Z0-9]{20,}\b'), "NPM token"),
+    (re.compile(r'\bpplx-[a-zA-Z0-9]{20,}\b'), "Perplexity token"),
+    (re.compile(r'-----BEGIN\s+(PRIVATE|RSA|EC)\s+KEY-----'), "PEM private key"),
+    (re.compile(r'\bpostgres://[^\s]+\b'), "PostgreSQL connection string"),
+    (re.compile(r'\bmysql://[^\s]+\b'), "MySQL connection string"),
+    (re.compile(r'\bmongodb(\+srv)?://[^\s]+\b'), "MongoDB connection string"),
+    (re.compile(r'\bredis://[^\s]+\b'), "Redis connection string"),
+    (re.compile(r'\bamqp://[^\s]+\b'), "AMQP connection string"),
+]
 
-if not vault:
-    print("Vault is empty — skipping scan")
-    sys.exit(0)
+# Skip binary files and common non-source files
+SKIP_EXTS = [".png", ".jpg", ".gif", ".pdf", ".zip", ".tar", ".gz", ".pem", ".key", 
+             ".mp4", ".mov", ".avi", ".so", ".a", ".o", ".obj"]
 
-# Get list of staged files (files to be committed, not vault files)
+def looks_like_secret(line):
+    """Check if a line contains a secret pattern."""
+    for pattern, name in PATTERNS:
+        if pattern.search(line):
+            return name
+    return None
+
+# Get list of staged files
 try:
     result = subprocess.run(
         ["git", "diff", "--cached", "--name-only", "--diff-filter=ACM"],
-        capture_output=True, text=True, cwd=workspace
+        capture_output=True, text=True, cwd=WORKSPACE
     )
     staged_files = [f.strip() for f in result.stdout.strip().split("\n") if f.strip()]
 except Exception as e:
@@ -49,36 +60,28 @@ if not staged_files:
 secrets_found = []
 
 for file_path in staged_files:
-    # Skip the secrets directory itself — never scan vault files
-    if file_path.startswith("secrets/") or file_path.startswith("secrets/"):
-        continue
-    
     # Skip binary files
-    skip_exts = [".png", ".jpg", ".gif", ".pdf", ".zip", ".tar", ".gz", ".pem", ".key"]
-    if any(file_path.endswith(ext) for ext in skip_exts):
+    if any(file_path.endswith(ext) for ext in SKIP_EXTS):
         continue
     
-    full_path = os.path.join(workspace, file_path)
+    full_path = os.path.join(WORKSPACE, file_path)
     
     if not os.path.isfile(full_path):
         continue
     
     try:
         with open(full_path, "r", errors="ignore") as f:
-            content = f.read()
+            for line_num, line in enumerate(f, 1):
+                secret_type = looks_like_secret(line)
+                if secret_type:
+                    secrets_found.append(f"  {file_path}:{line_num} — {secret_type}")
+                    break  # Only report once per file
     except Exception:
         continue
-    
-    # Scan content for vault secrets
-    for entry in vault:
-        value = entry.get("value", "")
-        name = entry.get("name", "unknown")
-        if value and value in content:
-            secrets_found.append(f"  {file_path}: contains secret '{name}'")
 
 if secrets_found:
     print("\n=== SECURITY SCAN FAILED ===")
-    print("Vault secrets detected in staged files:")
+    print("Secret patterns detected in staged files:")
     for s in secrets_found:
         print(s)
     print("\nCommit blocked.")

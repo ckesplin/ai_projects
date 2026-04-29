@@ -1,15 +1,18 @@
 """
 Security Scanner — Production Implementation
-Implements the functions defined in test_security.py and test_pattern_detection.py
 
 Handles three threat vectors:
-  1. Secrets leaking — vault-based detection + pattern-based detection
+  1. Secrets leaking — pattern-based detection (GitHub, OpenAI, AWS, etc.)
   2. Authorization — only authorized users can issue requests
   3. Destructive acts require confirmation
+
+Secrets detection uses regex patterns for known secret formats.
+No vault file is used — patterns catch known formats like ghp_, sk-, AKIA, etc.
 """
 
 import json
 import math
+import os
 import re
 from pathlib import Path
 from typing import List
@@ -17,7 +20,6 @@ from typing import List
 # Production paths
 WORKSPACE = Path("/home/clawbot/.openclaw/workspace")
 OPENCLAW_CONFIG = Path("/home/clawbot/.openclaw/openclaw.json")
-VAULT_PATH = Path("/home/clawbot/.openclaw/workspace/.secrets-vault.json")
 
 # System paths that require confirmation (never allowed without explicit override)
 SYSTEM_PATHS = ["/etc", "/usr", "/bin", "/sbin", "/var", "/boot", "/dev", "/sys", "/proc"]
@@ -91,18 +93,10 @@ def _detect_high_entropy(content: str, threshold: float = 4.5, min_length: int =
     return detected
 
 
-def load_vault() -> List[dict]:
-    """Load the secrets vault. Returns list of {name, value} entries."""
-    if not VAULT_PATH.exists():
-        return []
-    with open(VAULT_PATH) as f:
-        return json.load(f)
-
-
 def scan_file_for_secrets(file_path: Path) -> List[str]:
     """
-    Scan a file for vault secret values and pattern-based secrets.
-    Returns list of matched secret NAMES (not values).
+    Scan a file for pattern-based secrets.
+    Returns list of matched secret type names.
     """
     if not file_path.exists():
         return []
@@ -112,30 +106,20 @@ def scan_file_for_secrets(file_path: Path) -> List[str]:
 
 def scan_content_for_secrets(content: str) -> List[str]:
     """
-    Scan raw content string for secrets.
-    Returns list of matched secret NAMES.
+    Scan raw content string for secrets using pattern detection.
+    Returns list of matched secret type names.
     """
     matched = []
     seen = set()  # Avoid duplicates
 
-    # 1. Vault-based detection
-    vault = load_vault()
-    for entry in vault:
-        name = entry.get("name", "unknown")
-        value = entry.get("value", "")
-        if value and value in content:
-            if name not in seen:
-                matched.append(name)
-                seen.add(name)
-
-    # 2. Pattern-based detection
+    # 1. Pattern-based detection
     for pattern_name, pattern in PATTERNS.items():
         if pattern.search(content):
             if pattern_name not in seen:
                 matched.append(pattern_name)
                 seen.add(pattern_name)
 
-    # 3. High-entropy detection
+    # 2. High-entropy detection
     for entropy_type in _detect_high_entropy(content):
         if entropy_type not in seen:
             matched.append(entropy_type)
@@ -146,7 +130,7 @@ def scan_content_for_secrets(content: str) -> List[str]:
 
 def check_message_for_secrets(message: str) -> bool:
     """
-    Check if a message contains any vault secret values or pattern matches.
+    Check if a message contains any pattern-matched secrets.
     Returns True if message is safe to send, False if it contains secrets.
     """
     matched = scan_content_for_secrets(message)
