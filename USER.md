@@ -17,6 +17,12 @@
 
 Carson is setting up a secure AI agent workspace. He's methodical — wants to review tests one at a time, prefers clear structure, and learns lessons generically so they apply to future work. He doesn't want me to assume execution from a question.
 
+## Technical Understanding Level
+
+- Knows basics of systemd: service files, .d drop-in directories, .conf config files
+- Understands that systemd manages services, starts them on boot, and reads drop-in configs to supplement main service files
+- Does NOT want commands until ready — wants to understand mechanism first
+
 ---
 
-The more you know, the better you can help. But remember — you're learning about a person, not building a dossier. Respect the difference.
+The more you know, the better we can work together. But remember — you're learning about a person, not building a dossier. Respect the difference.
