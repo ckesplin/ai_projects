@@ -2,7 +2,9 @@
 
 ## Overview
 
-This is a process project: build the discipline and systems to improve memory over time, not achieve a one-time outcome. Every component has verification, regular review cadence, and improvement loops.
+This is an **outcome project** with a **process discipline**: build the systems and discipline to achieve measurable memory improvements over time. The goal is improved recall effectiveness, not just following a process.
+
+Every component has verification, regular review cadence, and improvement loops with measurable success criteria.
 
 ---
 
