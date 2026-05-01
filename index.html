@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MHS2 Save Transfer Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MHS2 Save Transfer</h1>
+            <p class="subtitle">Transfer save files between Steam accounts</p>
+        </header>
+
+        <main>
+            <div class="mode-selector">
+                <label class="mode-option">
+                    <input type="radio" name="mode" value="pc-to-pc" checked>
+                    <span class="mode-label">PC to PC</span>
+                    <span class="mode-desc">Transfer between Steam accounts</span>
+                </label>
+                <label class="mode-option">
+                    <input type="radio" name="mode" value="pc-to-nsw">
+                    <span class="mode-label">PC to Switch</span>
+                    <span class="mode-desc">Convert save for Nintendo Switch</span>
+                </label>
+                <label class="mode-option">
+                    <input type="radio" name="mode" value="nsw-to-pc">
+                    <span class="mode-label">Switch to PC</span>
+                    <span class="mode-desc">Convert Switch save to PC</span>
+                </label>
+            </div>
+
+            <div class="config-section">
+                <div class="input-group" id="steamid-group">
+                    <label for="steamid">Target Steam ID (64-bit)</label>
+                    <input type="number" id="steamid" placeholder="76561198012345678" min="0" step="1">
+                    <span class="hint">Find your Steam ID at <a href="https://steamidfinder.com/" target="_blank">steamidfinder.com</a></span>
+                    <span class="error" id="steamid-error"></span>
+                </div>
+            </div>
+
+            <div class="upload-section" id="drop-zone">
+                <div class="upload-icon">📁</div>
+                <p class="upload-text">Drag & drop your save file here</p>
+                <p class="upload-or">or</p>
+                <label class="upload-btn">
+                    Browse Files
+                    <input type="file" id="file-input" accept=".sav">
+                </label>
+                <p class="file-info" id="file-info"></p>
+            </div>
+
+            <button class="convert-btn" id="convert-btn" disabled>
+                Convert Save File
+            </button>
+
+            <div class="status" id="status"></div>
+            <div class="progress-bar" id="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Based on research by <a href="https://github.com/AsteriskAmpersand/MHST2-Save-Tools" target="_blank">AsteriskAmpersand</a> and <a href="https://github.com/Andoryuuta/MHS2SaveKeygen" target="_blank">Andoryuuta</a></p>
+            <p class="warning">This tool runs entirely in your browser. No data is sent to any server.</p>
+        </footer>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
