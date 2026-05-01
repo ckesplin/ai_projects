@@ -66,9 +66,9 @@ Every component has verification, regular review cadence, and improvement loops 
 ### 1.4 Deprecate memory-plex — COMPLETE
 
 **Actions:**
-- [x] Updated SKILL.md with deprecation notice
+- [x] Updated iSKILL.md with deprecation notice
 - [x] Documented migration path
-- [x] Confirmed truth-repo and calibration work independently
+- [x] Confirmed truth-repo and calibraton work independently
 
 **Verification:**
 - memory-plex stores remain but unused
