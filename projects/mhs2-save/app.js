@@ -156,6 +156,7 @@ convertBtn.addEventListener('click', async () => {
     } catch (err) {
         setStatus('Error: ' + err.message, 'error');
         progressFill.style.width = '0%';
+        console.error('Conversion error:', err);
     }
 });
 
