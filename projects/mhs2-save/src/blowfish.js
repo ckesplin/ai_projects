@@ -12,6 +12,18 @@ function F(S, x) {
     );
 }
 
+function encryptBlock(xl, xr, P, S) {
+    for (let i = 0; i < 16; i += 2) {
+        xl ^= P[i];
+        xr ^= F(S, xl);
+        xr ^= P[i + 1];
+        xl ^= F(S, xr);
+    }
+    xl ^= P[16];
+    xr ^= P[17];
+    return [xr, xl]; // Swap and return
+}
+
 export class Blowfish {
     constructor(key) {
         // Convert string key to bytes if needed
@@ -25,8 +37,7 @@ export class Blowfish {
         this.P = P;
     }
 
-    // Arrow function property - preserves 'this' binding from constructor
-    _generateSBoxes = (key) => {
+    _generateSBoxes(key) {
         const S = [
             new Uint32Array(256),
             new Uint32Array(256),
@@ -139,7 +150,7 @@ export class Blowfish {
         let xl = 0, xr = 0;
 
         for (let i = 0; i < 18; i += 2) {
-            const encrypted = this.encryptBlock(xl, xr);
+            const encrypted = encryptBlock(xl, xr, P, S);
             xl = encrypted[0];
             xr = encrypted[1];
             P[i] = xl;
@@ -148,7 +159,7 @@ export class Blowfish {
 
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 256; j += 2) {
-                const encrypted = this.encryptBlock(xl, xr);
+                const encrypted = encryptBlock(xl, xr, P, S);
                 xl = encrypted[0];
                 xr = encrypted[1];
                 S[i][j] = xl;
