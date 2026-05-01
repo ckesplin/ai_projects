@@ -21,9 +21,10 @@ export class SeededXorshift128 {
         let v3 = 521288629;
         let v4 = 88675123;
         let v5 = seed ^ 0xAC9365;
+        let v7;
 
         for (let i = 0; i < 100; i++) {
-            const v7 = v2;
+            v7 = v2;
             v2 = v3;
             v3 = v4;
             v5 ^= (0x65AC9365 >>> (v5 & 3)) ^ ((v5 ^ (0x65AC9365 >>> (v5 & 3))) >>> 3) 
