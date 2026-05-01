@@ -15,3 +15,4 @@
 {"key":"openclaw_skills_count","value":"9","source":"ls skills/ | wc -l","type":"VERIFIED","created_at":"2026-04-24T16:40:00Z"}
 {"key":"calibration_system","value":"working - track.py functional","source":"python3 track.py score","type":"VERIFIED","created_at":"2026-04-24T16:40:00Z"}
 {"key":"verify_workflow_created","value":"2026-04-24T16:38:00Z","source":"SKILL.md created","type":"VERIFIED","created_at":"2026-04-24T16:40:00Z"}
+{"key":"minimax_m27_context_window","value":"200K tokens","source":"benchlm.ai, verified against ollama.com library page","type":"VERIFIED","created_at":"2026-05-01T01:09:00Z"}

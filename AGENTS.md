@@ -185,6 +185,13 @@ You are free to edit `HEARTBEAT.md` with a short checklist or reminders. Keep it
 }
 ```
 
+### Reports
+
+- **Location:** `reports/` directory in workspace
+- **Naming:** `YYYY-MM-DD-description.md`
+- **Subdirectories:** OK for organization (e.g., `reports/security/`, `reports/architecture/`)
+- All formal reports go here, not to memory/ or workspace root
+
 **When to reach out:**
 
 - Important email arrived

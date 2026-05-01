@@ -1,103 +1,69 @@
+<!-- DEPRECATED 2026-05-01 -->
+<!--
+This skill is deprecated. The 3-layer memory architecture is now preferred:
+- MEMORY.md (curated, sectioned)
+- JSONL stores owned by skills (truth-repo, calibration)
+- Daily logs (memory/YYYY-MM-DD.md)
+
+Migration: Skills own their own stores. memory-plex stores are empty.
+See: reports/2026-05-01-memory-process-plan.md
+-->
+
 ---
 name: memory-plex
-description: >
-  Memory abstraction layer for organized, fast memory access.
-  Provides indexed memory stores with quick lookup, expiration, and tagging.
-  Use to avoid context window bloat and ensure memories persist across sessions.
+description: |
+  DEPRECATED 2026-05-01. Use 3-layer architecture instead:
+  MEMORY.md + truth-repo/calibration stores + daily logs.
+  See reports/2026-05-01-memory-process-plan.md
 ---
 
 # Memory Plex — Organized Memory Access
 
-*Memory Plex is how I remember. Fast lookup, organized stores, no context bloat.*
+*DEPRECATED: This skill is no longer maintained.*
 
----
+Memory Plex was an attempt to provide indexed memory stores with quick lookup, expiration, and tagging. It has been replaced by a simpler 3-layer architecture.
 
-## Architecture
+## Why Deprecated
+
+- Stores were mostly empty — skills already had their own
+- Fragmentation caused sync drift between memory-plex and truth-repo
+- Simple is more robust than complex
+
+## Migration Path
+
+| Was | Now |
+|:---|:---|
+| facts.store | truth-repo/truths.jsonl |
+| recent.store | memory/YYYY-MM-DD.md (daily logs) |
+| learn.store | MEMORY.md/LEARNED section |
+| context.store | Daily logs + session context |
+
+## What Still Works
+
+- Existing stores remain readable but are no longer written to
+- `/remember` commands still function but log deprecation warning
+- Query fallback to truth-repo if memory-plex search fails
+
+## Architecture (ARCHIVED)
 
 ```
 ~/.openclaw/workspace/skills/memory-plex/
 ├── index.json          # Master index of all memory stores
 ├── stores/             # Individual memory store files
-│   ├── facts.store     # Verified facts
-│   ├── recent.store    # Recent events (auto-expiring)
-│   ├── learn.store     # Lessons learned
-│   └── context.store   # Session context snippets
+│   ├── facts.store     # Verified facts (now: truth-repo)
+│   ├── recent.store    # Recent events (now: daily logs)
+│   ├── learn.store     # Lessons learned (now: MEMORY.md)
+│   └── context.store   # Session context (now: daily logs)
 ├── _schema.md          # This schema file
 ```
 
----
+## Commands (DEPRECATED)
 
-## Memory Store Types
-
-| Store | Type | TTL | Purpose |
-|:---|:---|:---|:---|
-| **facts** | key-value | never | Verified facts, ground truth |
-| **recent** | key-value | 24h | Recent events, temp context |
-| **learn** | append-only | never | Lessons learned, patterns |
-| **context** | key-value | 8h | Session context, working memory |
-
----
-
-## Commands
-
-### `/remember set <store> <key> <value> [--ttl=<duration>]`
-
-Store a memory.
-
-```
-/remember set facts openclaw_version "2026.4.22"
-/remember set recent user_reported_issue "chinese chars in output"
-/remember set learn always_check_brackets_in_paths true
-/remember set context current_project "trust-building" --ttl=8h
-```
-
-### `/remember get <store> <key>`
-
-Retrieve a memory.
-
-### `/remember list <store> [--all]`
-
-List memories in a store. `--all` includes expired.
-
-### `/remember search <query>`
-
-Search all stores for a query.
-
-### `/remember delete <store> <key>`
-
-Delete a memory.
-
-### `/remember clear <store>`
-
-Clear all memories in a store (with confirmation).
-
-### `/remember dump [--store=<store>]`
-
-Export memories as JSON.
-
-### `/remember import <json> [--store=<store>]`
-
-Import memories from JSON.
-
----
-
-## Auto-Maintenance
-
-- `recent` store auto-clears entries older than 24h
-- `context` store auto-clears entries older than 8h
-- Expired entries cleaned on access or via `/remember cleanup`
-
----
-
-## Integration Points
-
-- **Transparency skill** reads from `facts` and `recent` stores
-- **Truth repo skill** writes verified truths to `facts`
-- **Calibration skill** logs predictions to `learn`
-- **Beads memories** backfill into `learn` on demand
-
----
+All `/remember` commands are deprecated. Use:
+- truth-repo for verified facts
+- daily logs for events and context
+- MEMORY.md for curated learnings
 
 ## Schema Version
 
-Current: 1.0.0
+Current: 1.0.0 (deprecated)

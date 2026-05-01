@@ -25,4 +25,9 @@ Carson is setting up a secure AI agent workspace. He's methodical — wants to r
 
 ---
 
+## Model Context Windows
+
+- **minimax-m2.7:cloud** — 200K tokens (source: benchlm.ai/ollama.com, stored 2026-05-01)
+- When model changes: look up context window and store in truth-repo immediately
+
 The more you know, the better we can work together. But remember — you're learning about a person, not building a dossier. Respect the difference.
