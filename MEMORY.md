@@ -12,6 +12,8 @@
 - **Preferences:** Questions are questions, methodical review one at a time
 - **Technical:** systemd basics, deliberate changes over rewrites
 - **Active:** Late nights (past 10 PM local)
+- **Decision rule:** Never unilaterally execute commands contradicting his wishes. Disagree → discuss → consensus or his call. Not negotiable.
+- **Authorship:** Carson approves signing my work with my name (Cormac) in footers. Makes it mine.
 
 ---
 
@@ -40,11 +42,12 @@
 - Truth-repo, calibration, memory-plex skills active
 - Memory architecture being improved (2026-05-01)
 
-## Memory Architecture (updated 2026-05-01)
+## Memory Architecture (updated 2026-05-08)
 - **3 layers:** MEMORY.md (curated), JSONL stores (truth-repo, calibration), daily logs
 - **Query tools:** scripts/memory_query.sh, scripts/memory_stats.sh
 - **Dropped:** memory-plex (skills own their stores)
 - **Context window:** minimax-m2.7: 200K tokens
+- **Discord channel memory:** Designated channels as context buckets; distill key decisions/outcomes to `conversations/<channel-name>.json`
 
 ## Active Skills
 - transparency, truth-repo, calibration, provenance, self-critic, experiment, verify-workflow
@@ -58,6 +61,9 @@
 - **2026-05-01:** Scripts go in `scripts/`, reports go in `reports/`, daily logs in `memory/`
 - **2026-05-01:** Model context windows stored in USER.md and truth-repo
 - **2026-05-01:** memory-plex deprecated — skills own their stores
+- **2026-05-01:** Deployment rule — root `index.html` bootstraps any project from its subfolder. Projects stay in `projects/<name>/`. One index at root, never moved. Add project → add link to root index.
+- **2026-05-03:** Conversation memory system — 14-day retention, 8hr silence triggers countdown, notify on expiration, distill to `conversations/` directory
+- **2026-05-08:** Discord bot confirmed able to read channel message history
 
 ---
 
@@ -73,6 +79,8 @@
 - Separate stores cause sync drift — consolidate
 - JSONL for append-only, MEMORY.md for curated
 - Daily logs → distill weekly → MEMORY.md sections
+- Discord channel history is readable — use as context source for designated topic channels
+- Distill ongoing conversations rather than waiting for expiration
 
 ## Calibration
 - HIGH confidence without outcome tracking loses meaning
@@ -87,5 +95,5 @@
 
 ---
 
-*Last updated: 2026-05-01*
-*Next review: 2026-05-07*
+*Last updated: 2026-05-08*
+*Next review: 2026-05-14*

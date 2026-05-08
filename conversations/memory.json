@@ -1,0 +1,52 @@
+{
+  "channel_id": "1499273725411983481",
+  "channel_name": "#memory",
+  "purpose": "General workspace memory and agent configuration channel",
+  "key_decisions": [
+    {
+      "date": "2026-04-30",
+      "decision": "Memory architecture simplified to 3 layers: MEMORY.md (curated), JSONL stores (truth-repo, calibration), daily logs. Dropped memory-plex fragmentation.",
+      "outcome": "Skills own their stores; truth-repo and calibration maintain their own JSONL files"
+    },
+    {
+      "date": "2026-05-01",
+      "decision": "Deployment rule: root index.html bootstraps projects from subfolders. Projects stay in projects/<name>/. One index at root, never moved.",
+      "outcome": "Add project → add link to root index"
+    },
+    {
+      "date": "2026-05-01",
+      "decision": "Scripts go in scripts/, reports go in reports/, daily logs in memory/",
+      "outcome": "Clear directory conventions"
+    },
+    {
+      "date": "2026-05-01",
+      "decision": "Model context windows stored in USER.md and truth-repo",
+      "outcome": "minimax-m2.7: 200K tokens when model changes"
+    },
+    {
+      "date": "2026-05-03",
+      "decision": "Conversation memory system: 14-day retention, 8hr silence triggers countdown, notify on expiration, distill to memory",
+      "outcome": "Distilled conversations land in memory/conversations/ with topic/decisions/outcomes"
+    },
+    {
+      "date": "2026-05-03",
+      "decision": "Discord bot requires Read Message History permission for past message access",
+      "outcome": "Bot can read channel history now (verified 2026-05-08)"
+    }
+  ],
+  "outcomes": [
+    "Security scanner working with 33 pattern tests",
+    "Truth-repo, calibration, memory-plex skills active",
+    "Memory architecture improved (2026-05-01)",
+    "Conversation memory system designed and now being implemented"
+  ],
+  "insights": [
+    "Pattern matching > name matching for secret detection",
+    "Context window is 200K for minimax-m2.7",
+    "Separate stores cause sync drift — consolidate",
+    "HIGH confidence without outcome tracking loses meaning",
+    "External measurement (logged predictions) > internal self-assessment"
+  ],
+  "distilled_at": "2026-05-08T23:20:00Z",
+  "source": "discord #memory channel history (2026-05-01 to 2026-05-08)"
+}

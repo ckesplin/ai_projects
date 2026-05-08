@@ -277,3 +277,22 @@ bd close <id>         # Complete work
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
 <!-- END BEADS INTEGRATION -->
+
+---
+
+## Discord Channel Memory
+
+Carson creates Discord channels as explicit context buckets — channel names signal the topic.
+
+**Distillation (Option B + C):**
+- Channel history is read on-demand when working in that topic
+- Key decisions, outcomes, and insights get distilled into `conversations/<channel-name>.json`
+- Significant distillations also get stored in `MEMORY.md` for long-term retention
+
+**How to distill a channel:**
+1. Read recent messages (up to 100, using `--before <oldest_id>` if pagination needed)
+2. Extract: topic, purpose, decisions made, outcomes, notable insights
+3. Store in `conversations/<channel-name>.json`
+4. If important enough, update MEMORY.md with the distilled facts
+
+**Ongoing:** After each conversation session, distill while it's fresh rather than waiting for expiration.
